@@ -1,10 +1,14 @@
 package com.example.Quora.App.Repository;
 
 import com.example.Quora.App.Models.Questions;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Repository
 public interface QuestionRepository extends ReactiveMongoRepository<Questions,String>{
@@ -27,5 +31,14 @@ public interface QuestionRepository extends ReactiveMongoRepository<Questions,St
     Used when you expect a single item or no item at all, such as counting the number of questions by an author.
      */
     
+    
+    @Query ("{ $or: [ { 'title': { $regex: ?0, $options: 'i' } }, { 'content': { $regex: ?0, $options: 'i' } } ] }")
+    Flux<Questions> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String searchTerm, Pageable pageable);
+    
+    
+    Flux<Questions> findByCreatedAtGreaterThanOrderByCreatedAtAsc(LocalDateTime createdAt, Pageable pageable);
+    
+    
+    Flux<Questions> findTop10ByOrderByCreatedAtAsc();
 
 }

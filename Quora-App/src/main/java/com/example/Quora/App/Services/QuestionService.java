@@ -5,8 +5,12 @@ import com.example.Quora.App.DTO.QuestionResponseDTO;
 import com.example.Quora.App.Mapper.QuestionAdapter;
 import com.example.Quora.App.Models.Questions;
 import com.example.Quora.App.Repository.QuestionRepository;
+import com.example.Quora.App.utils.CursorUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -35,5 +39,36 @@ public class QuestionService implements IQuestionService{
                 
     }
     
-
+    @Override
+    public Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int page, int size) {
+        return questionRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(searchTerm, PageRequest.of(page, size))
+                .map(QuestionAdapter::toQuestionResponseDTO)
+                .doOnError(error -> System.out.println("Error searching questions: " + error))
+                .doOnComplete(() -> System.out.println("Search completed successfully."));
+    }
+    
+    
+    @Override
+    public Flux<QuestionResponseDTO> searchQuestionsCursor(String cursor, int size) {
+    
+        // In this we don't have to use page number - in short we don't want to have offset
+        
+        // Here we don't care about page , you can assume page number is 0
+        Pageable pageable = PageRequest.of(0, size);
+        
+        if (!CursorUtils.isValidCursor(cursor)) {
+            return questionRepository.findTop10ByOrderByCreatedAtAsc()
+                    .take(size)
+                    .map(QuestionAdapter::toQuestionResponseDTO)
+                    .doOnError(error -> System.out.println("Error in initial cursor-based search: " + error))
+                    .doOnComplete(() -> System.out.println("Initial cursor-based search completed successfully."));
+        } else {
+            LocalDateTime cursorTimeStamp = CursorUtils.parseCursor(cursor);
+            return questionRepository.findByCreatedAtGreaterThanOrderByCreatedAtAsc(cursorTimeStamp, pageable)
+                    .map(QuestionAdapter::toQuestionResponseDTO)
+                    .doOnError(error -> System.out.println("Error in cursor-based search: " + error))
+                    .doOnComplete(() -> System.out.println("Cursor-based search completed successfully."));
+        }
+    }
+    
 }
