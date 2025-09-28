@@ -2,8 +2,10 @@ package com.example.Quora.App.Services;
 
 import com.example.Quora.App.DTO.QuestionRequestDTO;
 import com.example.Quora.App.DTO.QuestionResponseDTO;
+import com.example.Quora.App.Events.ViewCountEvent;
 import com.example.Quora.App.Mapper.QuestionAdapter;
 import com.example.Quora.App.Models.Questions;
+import com.example.Quora.App.Producers.kafkaEventProducer;
 import com.example.Quora.App.Repository.QuestionRepository;
 import com.example.Quora.App.utils.CursorUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 public class QuestionService implements IQuestionService{
     
     private final QuestionRepository questionRepository;
+    
+    private final kafkaEventProducer kafkaEventProducer;
     
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO) {
@@ -86,7 +90,11 @@ public class QuestionService implements IQuestionService{
         return questionRepository.findById(id)
                 .map(QuestionAdapter::toQuestionResponseDTO)
                 .doOnError(error -> System.out.println("Error retrieving question by ID: " + error))
-                .doOnSuccess(response -> System.out.println("Retrieved question successfully: " + response));
+                .doOnSuccess(response ->{
+                    System.out.println("Retrieved question successfully: " + response);
+                    ViewCountEvent viewCountEvent = new ViewCountEvent(id, "QUESTION",LocalDateTime.now());
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                });
     }
     
     

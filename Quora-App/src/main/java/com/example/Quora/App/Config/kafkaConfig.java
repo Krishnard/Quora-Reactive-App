@@ -28,7 +28,7 @@ public class kafkaConfig {
     private String groupId;
     
     
-    public final String TOPIC_NAME = "view_count_topic";
+    public final static String TOPIC_NAME = "view_count_topic";
 
     @Bean
     public ProducerFactory<String,Object> producerFactory(){
