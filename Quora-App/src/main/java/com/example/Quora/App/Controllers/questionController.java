@@ -46,4 +46,12 @@ public class questionController {
         return questionService.searchQuestionsCursor(cursor, size);
     }
     
+    
+//    @GetMapping("/tag/{tag}")
+//    public Flux<QuestionResponseDTO> searchByTag(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size){
+//        return questionService.searchByTag(page, size);
+//    }
+    
 }

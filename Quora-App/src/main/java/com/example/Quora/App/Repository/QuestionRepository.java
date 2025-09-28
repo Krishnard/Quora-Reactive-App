@@ -1,6 +1,8 @@
 package com.example.Quora.App.Repository;
 
 import com.example.Quora.App.Models.Questions;
+import org.springframework.boot.web.server.Ssl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
@@ -40,5 +42,10 @@ public interface QuestionRepository extends ReactiveMongoRepository<Questions,St
     
     
     Flux<Questions> findTop10ByOrderByCreatedAtAsc();
-
+    
+    
+//    Flux<Questions> findAllByTagsContaining(Pageable pageable);
+    
+    
 }
+

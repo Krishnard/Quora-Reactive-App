@@ -13,4 +13,8 @@ public interface IQuestionService {
     public Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int page, int size);
     
     public Flux<QuestionResponseDTO> searchQuestionsCursor(String cursor, int size);
+    
+//    Flux<QuestionResponseDTO> searchByTag(int page, int size);
+
+    public Mono<QuestionResponseDTO> getQuestionById(String id);
 }

@@ -71,4 +71,23 @@ public class QuestionService implements IQuestionService{
         }
     }
     
+    
+//    @Override
+//    public Flux<QuestionResponseDTO> searchByTag(int page, int size){
+//        // Placeholder implementation
+//        return questionRepository.findAllByTagsContaining(PageRequest.of(page, size))
+//                .map(QuestionAdapter::toQuestionResponseDTO)
+//                .doOnError(error -> System.out.println("Error searching by tag: " + error))
+//                .doOnComplete(() -> System.out.println("Search by tag completed successfully."));
+//    }
+    
+    @Override
+    public Mono<QuestionResponseDTO> getQuestionById(String id) {
+        return questionRepository.findById(id)
+                .map(QuestionAdapter::toQuestionResponseDTO)
+                .doOnError(error -> System.out.println("Error retrieving question by ID: " + error))
+                .doOnSuccess(response -> System.out.println("Retrieved question successfully: " + response));
+    }
+    
+    
 }
