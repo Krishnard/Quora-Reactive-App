@@ -54,4 +54,11 @@ public class questionController {
 //        return questionService.searchByTag(page, size);
 //    }
     
+    @GetMapping({"/{id}"})
+    public Mono<QuestionResponseDTO> getQuestionById(@PathVariable String id){
+        return questionService.getQuestionById(id)
+                .doOnError(error -> System.out.println("Error fetching question by ID: " + error))
+                .doOnSuccess(response -> System.out.println("Fetched question by ID successfully: " + response));
+    }
+    
 }
